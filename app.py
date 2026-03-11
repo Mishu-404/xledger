@@ -99,7 +99,7 @@ def build_html(trips, company, provider):
 <style>
   @page {{ size:A4; margin:13mm; }}
   *{{ box-sizing:border-box; margin:0; padding:0; }}
-  body{{ font-family:'Hind Siliguri','Noto Sans Bengali',sans-serif; color:{C['navy']}; font-size:13px;
+  body{{ font-family:'Noto Sans Bengali','Hind Siliguri',sans-serif; color:{C['navy']}; font-size:13px;
         -webkit-print-color-adjust:exact; print-color-adjust:exact; }}
   h2{{ font-size:15px; font-weight:700; color:{C['navy']}; margin:14px 0 6px;
       padding-bottom:4px; border-bottom:3px solid {C['sky']}; }}
