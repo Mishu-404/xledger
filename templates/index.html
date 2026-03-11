@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>XLedger v2.0</title>
+<link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
+<style>
+  :root { --navy:#1A2E4A; --sky:#3B7DD8; --skyL:#EBF4FF; --green:#1A7A3C; --red:#C0392B; --bg:#F0F6FF; --border:#C8DCF0; --muted:#4A6A8A; }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { font-family:'Hind Siliguri',sans-serif; background:var(--bg); color:var(--navy); min-height:100vh; display:flex; flex-direction:column; }
+  header { background:var(--navy); padding:15px 36px; display:flex; align-items:center; justify-content:space-between; }
+  .lv { background:var(--sky); color:#fff; font-family:'JetBrains Mono',monospace; font-size:11px; font-weight:600; padding:3px 8px; border-radius:5px; margin-right:10px; }
+  main { flex:1; display:flex; align-items:center; justify-content:center; padding:40px 20px; }
+  .card { background:#fff; border:1px solid var(--border); border-radius:20px; padding:44px 48px; width:100%; max-width:500px; box-shadow:0 4px 32px rgba(59,125,216,0.08); }
+  .drop-zone { border:2px dashed var(--border); border-radius:14px; padding:36px 20px; text-align:center; cursor:pointer; transition:all 0.2s; position:relative; margin-bottom:20px; }
+  .drop-zone:hover { border-color:var(--sky); background:var(--skyL); }
+  .drop-zone input { position:absolute; inset:0; opacity:0; cursor:pointer; width:100%; height:100%; }
+  .fields { display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-bottom:24px; }
+  label { display:block; font-size:12px; font-weight:600; color:var(--muted); margin-bottom:5px; }
+  input[type=text] { width:100%; padding:9px 12px; border:1.5px solid var(--border); border-radius:8px; font-family:'Hind Siliguri',sans-serif; font-size:14px; background:var(--bg); outline:none; }
+  input[type=text]:focus { border-color:var(--sky); }
+  .btn { width:100%; padding:16px; background:linear-gradient(135deg,var(--navy),var(--sky)); color:#fff; border:none; border-radius:12px; font-family:'Hind Siliguri',sans-serif; font-size:17px; font-weight:700; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:10px; box-shadow:0 4px 14px rgba(59,125,216,0.3); transition:all 0.2s; }
+  .btn:hover { transform:translateY(-2px); }
+  .btn:disabled { opacity:0.6; cursor:not-allowed; transform:none; }
+  .spinner { width:20px; height:20px; border:3px solid rgba(255,255,255,0.3); border-top-color:#fff; border-radius:50%; animation:spin 0.7s linear infinite; display:none; }
+  @keyframes spin { to { transform:rotate(360deg); } }
+  .status { margin-top:14px; font-size:13px; text-align:center; min-height:20px; }
+  .ok { color:var(--green); font-weight:600; }
+  .err { color:var(--red); font-weight:600; }
+  footer { text-align:right; padding:14px 36px; font-size:11px; color:#B0C4D8; font-family:'JetBrains Mono',monospace; }
+</style>
+</head>
+<body>
+<header>
+  <div style="display:flex;align-items:center">
+    <span class="lv">v2.0</span>
+    <div>
+      <div style="color:#fff;font-size:18px;font-weight:700">XLedger</div>
+      <div style="color:#7A9ABF;font-size:12px;font-family:'JetBrains Mono',monospace">by Mishu</div>
+    </div>
+  </div>
+  <div style="color:#7A9ABF;font-size:13px;font-family:'JetBrains Mono',monospace">বাংলা PDF রিপোর্ট</div>
+</header>
+
+<main>
+  <div class="card">
+    <div style="font-size:22px;font-weight:700;margin-bottom:4px">📊 পরিবহন রিপোর্ট</div>
+    <div style="font-size:14px;color:var(--muted);margin-bottom:28px">Excel আপলোড করুন → PDF সরাসরি ডাউনলোড হবে</div>
+
+    <form id="form" action="/generate" method="POST" enctype="multipart/form-data">
+      <div class="drop-zone" id="dz">
+        <input type="file" name="file" id="fi" accept=".xlsx,.xls" required>
+        <div style="font-size:36px;margin-bottom:10px">📂</div>
+        <div style="font-size:15px;font-weight:600;margin-bottom:4px">Excel ফাইল টেনে আনুন বা ক্লিক করুন</div>
+        <div style="font-size:12px;color:var(--muted)">.xlsx / .xls</div>
+        <div id="fn" style="display:none;margin-top:10px;background:#E8F5E9;color:var(--green);border:1px solid #A5D6A7;border-radius:20px;padding:5px 14px;font-size:13px;font-weight:600;display:none;align-items:center;gap:6px">✅ <span id="ft"></span></div>
+      </div>
+
+      <div class="fields">
+        <div><label>প্রতিষ্ঠানের নাম</label><input type="text" name="company" value="এক্স সিরামিক"></div>
+        <div><label>তথ্য প্রদানকারী</label><input type="text" name="provider" value="আরিফুল ইসলাম"></div>
+      </div>
+
+      <button class="btn" type="submit" id="btn">
+        <span class="spinner" id="sp"></span>
+        <span id="bt">⬇️ PDF ডাউনলোড করুন</span>
+      </button>
+    </form>
+    <div class="status" id="st"></div>
+  </div>
+</main>
+<footer>XLedger v2.0 &nbsp;|&nbsp; by Mishu</footer>
+
+<script>
+  const fi=document.getElementById('fi'), fn=document.getElementById('fn'), ft=document.getElementById('ft');
+  const btn=document.getElementById('btn'), bt=document.getElementById('bt'), sp=document.getElementById('sp'), st=document.getElementById('st');
+  const dz=document.getElementById('dz');
+  dz.addEventListener('dragover',e=>{e.preventDefault();dz.style.borderColor='#3B7DD8';});
+  dz.addEventListener('dragleave',()=>{dz.style.borderColor='';});
+  dz.addEventListener('drop',e=>{e.preventDefault();if(e.dataTransfer.files[0]){fi.files=e.dataTransfer.files;showFile(e.dataTransfer.files[0].name);}});
+  fi.addEventListener('change',()=>{if(fi.files[0])showFile(fi.files[0].name);});
+  function showFile(n){ft.textContent=n;fn.style.display='inline-flex';st.textContent='';st.className='status';}
+  document.getElementById('form').addEventListener('submit',async function(e){
+    e.preventDefault();
+    if(!fi.files[0]){st.textContent='⚠️ আগে Excel ফাইল বেছে নিন';st.className='status err';return;}
+    btn.disabled=true;sp.style.display='block';bt.textContent='তৈরি হচ্ছে...';st.textContent='';
+    try{
+      const fd=new FormData(this);
+      const res=await fetch('/generate',{method:'POST',body:fd});
+      if(!res.ok)throw new Error(await res.text());
+      const blob=await res.blob();
+      const url=URL.createObjectURL(blob);
+      const a=document.createElement('a');
+      const d=new Date();
+      a.href=url;a.download=`XLedger_Report_${String(d.getDate()).padStart(2,'0')}-${String(d.getMonth()+1).padStart(2,'0')}-${d.getFullYear()}.pdf`;
+      a.click();URL.revokeObjectURL(url);
+      st.textContent='✅ PDF ডাউনলোড হয়েছে!';st.className='status ok';
+    }catch(err){st.textContent='❌ ত্রুটি: '+err.message;st.className='status err';}
+    finally{btn.disabled=false;sp.style.display='none';bt.textContent='⬇️ PDF ডাউনলোড করুন';}
+  });
+</script>
+</body>
+</html>
