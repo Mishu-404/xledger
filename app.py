@@ -21,13 +21,13 @@ def now_bst():
 
 def get_font_css():
     paths = [
-        os.path.join(os.path.dirname(os.path.abspath(__file__)), 'static', 'FreeSansBengali.ttf'),
-        '/opt/render/project/src/static/FreeSansBengali.ttf',
+        os.path.join(os.path.dirname(os.path.abspath(__file__)), 'static', 'kalpurush.ttf'),
+        '/opt/render/project/src/static/kalpurush.ttf',
     ]
     for p in paths:
         if os.path.exists(p):
             url = 'file://' + p
-            return "@font-face { font-family: 'BnFont'; src: url(" + url + ") format('truetype'); }"
+            return "@font-face { font-family: 'Kalpurush'; src: url(" + url + ") format('truetype'); }"
     return ""
 
 def parse_trips(file_obj):
@@ -134,13 +134,13 @@ def build_html(trips, company, provider):
         s3 += '<tr>' + \
               td(bn(t['n']), bg=alt(i)) + \
               td(t['date'],   bg=alt(i), size=11) + \
-              td(t['truck'],  bg=alt(i), size=11) + \
+              td(t['truck'],  bg=alt(i), size=10) + \
               td(t['dealer'], align='left', bg=alt(i), size=11) + \
               td(t['dest'],   bg=alt(i), size=11) + \
-              td(fmtbn(t['sqft']), align='right', bg=alt(i), size=11) + \
+              td(fmtbn(t['sqft']), align='right', bold=True, bg=alt(i), size=11) + \
               td('৳ '+fmtbn(t['bill']),  color='#1A5276', bold=True, align='right', bg=alt(i), size=11) + \
-              td('৳ '+fmtbn(t['fare']),  color='#2A9D8F', align='right', bg=alt(i), size=11) + \
-              td('৳ '+fmtbn(vc),         color='#B7770D', align='right', bg=alt(i), size=11) + \
+              td('৳ '+fmtbn(t['fare']),  color='#2A9D8F', bold=True, align='right', bg=alt(i), size=11) + \
+              td('৳ '+fmtbn(vc),         color='#B7770D', bold=True, align='right', bg=alt(i), size=11) + \
               td(sg+'৳ '+fmtbn(abs(t['profit'])), color=pc, bold=True, align='right', bg=alt(i), size=11) + \
               '</tr>'
     s3 += ('<tr style="background:#D6E8FA;font-weight:700;">'
@@ -159,7 +159,7 @@ def build_html(trips, company, provider):
         + font_css +
         ' @page { size: A4; margin: 13mm; }'
         ' * { box-sizing: border-box; margin: 0; padding: 0; }'
-        " body { font-family: 'BnFont', sans-serif; color: #1A2E4A; font-size: 13px; -webkit-print-color-adjust: exact; print-color-adjust: exact; }"
+        " body { font-family: 'Kalpurush', sans-serif; color: #1A2E4A; font-size: 13px; -webkit-print-color-adjust: exact; print-color-adjust: exact; }"
         ' h2 { font-size: 15px; font-weight: 700; color: #1A2E4A; margin: 14px 0 6px; padding-bottom: 4px; border-bottom: 3px solid #3B7DD8; }'
         ' table { width: 100%; border-collapse: collapse; margin-bottom: 2px; }'
         ' .footer { margin-top: 18px; padding-top: 7px; border-top: 1px solid #D0DEF0; display: flex; justify-content: space-between; }'
@@ -175,7 +175,7 @@ def build_html(trips, company, provider):
         '<h2>২.&nbsp; দৈনিকভিত্তিক বিবরণ</h2>'
         '<table><thead><tr>' + th('তারিখ') + th('যাত্রা','center','50px') + th('মোট বিল (৳)','right') + th('মোট ভাড়া (৳)','right') + th('ভ্যাট+COF (৳)','right') + th('নেট লাভ (৳)','right') + '</tr></thead><tbody>' + s2 + '</tbody></table>'
         '<h2>৩.&nbsp; সম্পূর্ণ যাত্রা তালিকা</h2>'
-        '<table><thead><tr>' + th('ক্র.','center','28px') + th('তারিখ','center','62px') + th('ট্রাক','center','62px') + th('ডিলার','left') + th('গন্তব্য','center','72px') + th('বর্গফুট','right','56px') + th('বিল','right','66px') + th('ভাড়া','right','63px') + th('ভ্যাট-COF','right','68px') + th('লাভ (৳)','right','73px') + '</tr></thead><tbody>' + s3 + '</tbody></table>'
+        '<table><thead><tr>' + th('ক্র.','center','28px') + th('তারিখ','center','62px') + th('ট্রাক','center','48px') + th('ডিলার','left') + th('গন্তব্য','center','72px') + th('বর্গফুট','right','56px') + th('বিল','right','66px') + th('ভাড়া','right','63px') + th('ভ্যাট-COF','right','68px') + th('লাভ (৳)','right','73px') + '</tr></thead><tbody>' + s3 + '</tbody></table>'
         '<div class="footer">'
         '<div style="font-size:12px;color:#4A6A8A">তথ্য প্রদানকারীঃ &nbsp;<strong style="color:#1A2E4A">' + provider + '</strong></div>'
         '<div style="font-size:10px;color:#C8D8EA;">XLedger v2.0 | by Mishu</div>'
