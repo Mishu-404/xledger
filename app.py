@@ -13,6 +13,15 @@ def bn(n):    return str(n).translate(BN_TR)
 def fmt(n):   return "{:,}".format(abs(int(n)))
 def fmtbn(n): return bn(fmt(n))
 
+def bn_date(date_str):
+    try:
+        parts = date_str.replace('/', '-').split('-')
+        d, m, y = int(parts[0]), int(parts[1]), int(parts[2])
+        if y >= 100: y = y % 100
+        return "{} {} {}".format(bn(d), BN_MONTHS[m-1], bn(y))
+    except:
+        return date_str
+
 def now_bst():
     bst = datetime.now(timezone.utc) + timedelta(hours=6)
     return "{} {} {}  |  {}:{}".format(
@@ -112,7 +121,7 @@ def build_html(trips, company, provider):
     for i, (d, v) in enumerate(daily.items()):
         pc = '#1A7A3C' if v['profit'] >= 0 else '#C0392B'
         sg = '-' if v['profit'] < 0 else ''
-        s2 += '<tr>' + td(d, bg=alt(i)) + td(bn(v['cnt'])+'টি', bg=alt(i)) + \
+        s2 += '<tr>' + td(bn_date(d), bg=alt(i), size=11) + td(bn(v['cnt'])+'টি', bg=alt(i)) + \
               td('৳ '+fmtbn(v['bill']),   color='#1A5276', bold=True, align='right', bg=alt(i)) + \
               td('৳ '+fmtbn(v['fare']),   color='#2A9D8F', align='right', bg=alt(i)) + \
               td('৳ '+fmtbn(v['vatcof']), color='#B7770D', align='right', bg=alt(i)) + \
@@ -133,7 +142,7 @@ def build_html(trips, company, provider):
         sg = '-' if t['profit'] < 0 else ''
         s3 += '<tr>' + \
               td(bn(t['n']), bg=alt(i)) + \
-              td(t['date'],   bg=alt(i), size=11) + \
+              td(bn_date(t['date']), bg=alt(i), size=11) + \
               td(t['truck'],  bg=alt(i), size=10) + \
               td(t['dealer'], align='left', bg=alt(i), size=11) + \
               td(t['dest'],   bg=alt(i), size=11) + \
