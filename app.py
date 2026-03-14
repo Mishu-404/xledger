@@ -73,7 +73,7 @@ def td(text, color='', bold=False, align='center', bg='', size=12):
     s = 'padding:6px 9px;font-size:{}px;text-align:{};border:1px solid #C8DCF0;'.format(size, align)
     if bg:    s += 'background:{};'.format(bg)
     if color: s += 'color:{};'.format(color)
-    if bold:  s += 'font-weight:700;'
+    if bold:  s += 'font-weight:700;-webkit-text-stroke:0.4px currentColor;'
     return '<td style="{}">{}</td>'.format(s, text)
 
 def th(text, align='center', width=''):
@@ -146,11 +146,11 @@ def build_html(trips, company, provider):
               td(t['truck'],  bg=alt(i), size=10) + \
               td(t['dealer'], align='left', bg=alt(i), size=11) + \
               td(t['dest'],   bg=alt(i), size=11) + \
-              td(fmtbn(t['sqft']), align='right', bold=True, bg=alt(i), size=11) + \
-              td('৳ '+fmtbn(t['bill']),  color='#1A5276', bold=True, align='right', bg=alt(i), size=11) + \
-              td('৳ '+fmtbn(t['fare']),  color='#2A9D8F', bold=True, align='right', bg=alt(i), size=11) + \
-              td('৳ '+fmtbn(vc),         color='#B7770D', bold=True, align='right', bg=alt(i), size=11) + \
-              td(sg+'৳ '+fmtbn(abs(t['profit'])), color=pc, bold=True, align='right', bg=alt(i), size=11) + \
+              td(fmtbn(t['sqft']), align='right', bold=True, bg=alt(i), size=12) + \
+              td('৳ '+fmtbn(t['bill']),  color='#1A5276', bold=True, align='right', bg=alt(i), size=12) + \
+              td('৳ '+fmtbn(t['fare']),  color='#2A9D8F', bold=True, align='right', bg=alt(i), size=12) + \
+              td('৳ '+fmtbn(vc),         color='#B7770D', bold=True, align='right', bg=alt(i), size=12) + \
+              td(sg+'৳ '+fmtbn(abs(t['profit'])), color=pc, bold=True, align='right', bg=alt(i), size=12) + \
               '</tr>'
     s3 += ('<tr style="background:#D6E8FA;font-weight:700;">'
            '<td style="' + TS + '">মোট</td>'
