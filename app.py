@@ -19,6 +19,17 @@ def now_bst():
         bn(bst.day), BN_MONTHS[bst.month-1], bn(bst.year),
         bn(bst.strftime('%H')), bn(bst.strftime('%M')))
 
+def get_font_css():
+    paths = [
+        os.path.join(os.path.dirname(os.path.abspath(__file__)), 'static', 'FreeSansBengali.ttf'),
+        '/opt/render/project/src/static/FreeSansBengali.ttf',
+    ]
+    for p in paths:
+        if os.path.exists(p):
+            url = 'file://' + p
+            return "@font-face { font-family: 'BnFont'; src: url(" + url + ") format('truetype'); }"
+    return ""
+
 def parse_trips(file_obj):
     df = pd.read_excel(file_obj, sheet_name=0, header=None)
     trips = []
@@ -62,7 +73,6 @@ def th(text, align='center', width=''):
     return '<th style="{}">{}</th>'.format(s, text)
 
 def alt(i): return '#EBF4FF' if i % 2 == 0 else '#FFFFFF'
-
 TS = 'padding:7px 9px;border:1px solid #C8DCF0;'
 
 def build_html(trips, company, provider):
@@ -85,7 +95,6 @@ def build_html(trips, company, provider):
         daily[d]['vatcof'] += t['vat'] + t['cof']
         daily[d]['profit'] += t['profit']
 
-    # Section 1
     s1 = ''
     for i, (lbl, val, col, note) in enumerate([
         ('মোট বিল (Total Bill)',     tBill,   '#1A5276', '{} যাত্রার মোট বিল'.format(bn(len(trips)))),
@@ -96,10 +105,9 @@ def build_html(trips, company, provider):
     ]):
         sg = '-' if val < 0 else ''
         s1 += '<tr>' + td(bn(i+1), bg=alt(i)) + td(lbl, align='left', bg=alt(i)) + \
-              td(sg + '৳ ' + fmtbn(abs(val)), color=col, bold=True, align='right', bg=alt(i)) + \
+              td(sg+'৳ '+fmtbn(abs(val)), color=col, bold=True, align='right', bg=alt(i)) + \
               td(note, bg=alt(i), size=11) + '</tr>'
 
-    # Section 2
     s2 = ''
     for i, (d, v) in enumerate(daily.items()):
         pc = '#1A7A3C' if v['profit'] >= 0 else '#C0392B'
@@ -118,7 +126,6 @@ def build_html(trips, company, provider):
            '<td style="' + TS + 'text-align:right;color:' + tc + ';font-weight:700;">' + tsg + '৳ ' + fmtbn(abs(tProfit)) + '</td>'
            '</tr>')
 
-    # Section 3
     s3 = ''
     for i, t in enumerate(trips):
         vc = t['vat'] + t['cof']
@@ -145,14 +152,17 @@ def build_html(trips, company, provider):
            '<td style="' + TS + 'text-align:right;color:' + tc + ';font-weight:700;">' + tsg + '৳ ' + fmtbn(abs(tProfit)) + '</td>'
            '</tr>')
 
+    font_css = get_font_css()
+
     return (
         '<!DOCTYPE html><html lang="bn"><head><meta charset="UTF-8"><style>'
-        '@page { size: A4; margin: 13mm; }'
-        '* { box-sizing: border-box; margin: 0; padding: 0; }'
-        "body { font-family: 'Noto Sans Bengali', 'Noto Sans', sans-serif; color: #1A2E4A; font-size: 13px; -webkit-print-color-adjust: exact; print-color-adjust: exact; }"
-        'h2 { font-size: 15px; font-weight: 700; color: #1A2E4A; margin: 14px 0 6px; padding-bottom: 4px; border-bottom: 3px solid #3B7DD8; }'
-        'table { width: 100%; border-collapse: collapse; margin-bottom: 2px; }'
-        '.footer { margin-top: 18px; padding-top: 7px; border-top: 1px solid #D0DEF0; display: flex; justify-content: space-between; }'
+        + font_css +
+        ' @page { size: A4; margin: 13mm; }'
+        ' * { box-sizing: border-box; margin: 0; padding: 0; }'
+        " body { font-family: 'BnFont', sans-serif; color: #1A2E4A; font-size: 13px; -webkit-print-color-adjust: exact; print-color-adjust: exact; }"
+        ' h2 { font-size: 15px; font-weight: 700; color: #1A2E4A; margin: 14px 0 6px; padding-bottom: 4px; border-bottom: 3px solid #3B7DD8; }'
+        ' table { width: 100%; border-collapse: collapse; margin-bottom: 2px; }'
+        ' .footer { margin-top: 18px; padding-top: 7px; border-top: 1px solid #D0DEF0; display: flex; justify-content: space-between; }'
         '</style></head><body>'
         '<div style="display:flex;justify-content:space-between;align-items:center;padding-bottom:7px;border-bottom:3px solid #3B7DD8;margin-bottom:9px">'
         '<div style="font-size:20px;font-weight:700">' + company + '</div>'
@@ -187,12 +197,9 @@ def generate():
         trips = parse_trips(file)
         if not trips:
             return 'কোনো ট্রিপ ডেটা পাওয়া যায়নি', 400
-
         html_content = build_html(trips, company, provider)
-
         from weasyprint import HTML
         pdf_bytes = HTML(string=html_content).write_pdf()
-
         filename = 'XLedger_Report_{}.pdf'.format(date.today().strftime('%d-%m-%Y'))
         return send_file(io.BytesIO(pdf_bytes), mimetype='application/pdf',
                          as_attachment=True, download_name=filename)
